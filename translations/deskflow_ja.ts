@@ -1283,11 +1283,47 @@ Enabling this setting will disable the server config GUI.</source>
     </message>
     <message>
         <source>Run command on enter</source>
-        <translation>画面に入る時にコマンドを実行</translation>
+        <translation>クライアントコンピューターへの入力時にコマンドを実行</translation>
     </message>
     <message>
         <source>Run command on exit</source>
-        <translation>画面から出る時にコマンドを実行</translation>
+        <translation>クライアントコンピューターからの退出時にコマンドを実行</translation>
+    </message>
+    <message>
+        <source>Enable remote input capture sharing by default when this computer unlocks</source>
+        <translation type="unfinished">このコンピューターのロック解除時にリモート入力キャプチャ共有を既定で有効にする</translation>
+    </message>
+    <message>
+        <source>Start sharing when this computer unlocks and stop sharing when it locks.</source>
+        <translation type="unfinished">このコンピューターのロック解除時に共有を開始し、ロック時に停止します。</translation>
+    </message>
+    <message>
+        <source>Run command when this computer unlocks</source>
+        <translation type="unfinished">このコンピューターのロック解除時にコマンドを実行</translation>
+    </message>
+    <message>
+        <source>Run command when this computer locks</source>
+        <translation type="unfinished">このコンピューターのロック時にコマンドを実行</translation>
+    </message>
+    <message>
+        <source>Command or path to a script</source>
+        <translation type="unfinished">コマンドまたはスクリプトのパス</translation>
+    </message>
+    <message>
+        <source>Select a script file</source>
+        <translation type="unfinished">スクリプトファイルを選択</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation type="unfinished">参照...</translation>
+    </message>
+    <message>
+        <source>Select Script File</source>
+        <translation type="unfinished">スクリプトファイルを選択</translation>
+    </message>
+    <message>
+        <source>Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;All files (*)</source>
+        <translation type="unfinished">スクリプト (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;すべてのファイル (*)</translation>
     </message>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>

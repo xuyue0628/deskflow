@@ -819,23 +819,119 @@
           <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
          </property>
          <item row="0" column="0">
+          <widget class="QCheckBox" name="cbAutoShareOnUnlock">
+           <property name="toolTip">
+            <string>Start sharing when this computer unlocks and stop sharing when it locks.</string>
+           </property>
+           <property name="text">
+            <string>Enable remote input capture sharing by default when this computer unlocks</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="cbRunUnlockCommand">
+           <property name="text">
+            <string>Run command when this computer unlocks</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="unlockCommandLayout">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLineEdit" name="lineCommandUnlock">
+             <property name="placeholderText">
+              <string>Command or path to a script</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnBrowseUnlockCommand">
+             <property name="toolTip">
+              <string>Select a script file</string>
+             </property>
+             <property name="text">
+              <string>Browse...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="cbRunLockCommand">
+           <property name="text">
+            <string>Run command when this computer locks</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="lockCommandLayout">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLineEdit" name="lineCommandLock">
+             <property name="placeholderText">
+              <string>Command or path to a script</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnBrowseLockCommand">
+             <property name="toolTip">
+              <string>Select a script file</string>
+             </property>
+             <property name="text">
+              <string>Browse...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
           <widget class="QCheckBox" name="cbRunEnterCommand">
            <property name="text">
             <string>Run command on enter</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="3" column="1">
           <widget class="QLineEdit" name="lineCommandEnter"/>
          </item>
-         <item row="1" column="0">
+         <item row="4" column="0">
           <widget class="QCheckBox" name="cbRunExitCommand">
            <property name="text">
             <string>Run command on exit</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="4" column="1">
           <widget class="QLineEdit" name="lineCommandExit"/>
          </item>
         </layout>

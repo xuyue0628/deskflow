@@ -37,6 +37,8 @@ private:
   void regenCertificates();
   void browseCertificatePath();
   void browseLogPath();
+  void browseUnlockCommand();
+  void browseLockCommand();
   void setLogToFile(bool logToFile);
   void accept() override;
   bool isClientMode() const;

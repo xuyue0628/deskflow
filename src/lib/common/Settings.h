@@ -63,6 +63,11 @@ public:
     inline static const auto ComputerEnterCommand = QStringLiteral("core/enterCommand");
     inline static const auto EnableExitCommand = QStringLiteral("core/enableExitCommand");
     inline static const auto ComputerExitCommand = QStringLiteral("core/exitCommand");
+    inline static const auto AutoShareOnUnlock = QStringLiteral("core/autoShareOnUnlock");
+    inline static const auto EnableUnlockCommand = QStringLiteral("core/enableUnlockCommand");
+    inline static const auto UnlockCommand = QStringLiteral("core/unlockCommand");
+    inline static const auto EnableLockCommand = QStringLiteral("core/enableLockCommand");
+    inline static const auto LockCommand = QStringLiteral("core/lockCommand");
   };
   struct Daemon
   {
@@ -209,6 +214,10 @@ public:
   static QString logLevelText();
   static QSettingsProxy &proxy();
   static NetworkProtocol networkProtocol();
+  static constexpr bool isAutoShareOnUnlockAvailable()
+  {
+    return false;
+  }
   static void save(bool emitSaving = true);
   static QStringList validKeys();
   static QStringList validGroups();
@@ -290,8 +299,13 @@ private:
     , Core::ProcessMode
     , Core::EnableEnterCommand
     , Core::EnableExitCommand
+    , Core::AutoShareOnUnlock
+    , Core::EnableUnlockCommand
+    , Core::EnableLockCommand
     , Core::ComputerEnterCommand
     , Core::ComputerExitCommand
+    , Core::UnlockCommand
+    , Core::LockCommand
     , Core::ComputerName
     , Core::Display
     , Core::UseHooks
@@ -350,6 +364,9 @@ private:
     , Core::PreventSleep
     , Core::EnableEnterCommand
     , Core::EnableExitCommand
+    , Core::AutoShareOnUnlock
+    , Core::EnableUnlockCommand
+    , Core::EnableLockCommand
     , Client::DynamicConnectionRetry
     , Client::InvertYScroll
     , Client::InvertXScroll

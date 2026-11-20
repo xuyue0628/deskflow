@@ -32,6 +32,9 @@ class QLocalServer;
 class DeskflowApplication;
 class LogDock;
 class StatusBar;
+#ifdef Q_OS_LINUX
+class XDGPowerManager;
+#endif
 
 namespace Ui {
 class MainWindow;
@@ -138,6 +141,9 @@ private:
   void showHostNameEditor();
   void setHostName();
   void daemonIpcClientConnectionFailed();
+  void systemLockChanged(bool locked);
+  void runSystemLockCommand() const;
+  void runSystemUnlockCommand() const;
   void toggleCanRunCore(bool enableButtons);
   void remoteHostChanged(const QString &newRemoteHost);
   void updateIpLabel(const QStringList &addresses);
@@ -211,4 +217,7 @@ private:
   QStringList m_serverStartIPs;
   QString m_serverStartSuggestedIP;
   QUrl m_helpPath;
+#ifdef Q_OS_LINUX
+  XDGPowerManager *m_screenLockMonitor = nullptr;
+#endif
 };

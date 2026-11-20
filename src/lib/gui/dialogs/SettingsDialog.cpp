@@ -24,6 +24,37 @@
 
 using namespace deskflow::gui;
 
+namespace {
+
+QString scriptCommand(const QString &file)
+{
+  const auto path = QDir::toNativeSeparators(QFileInfo(file).absoluteFilePath());
+  const auto suffix = QFileInfo(path).suffix().toLower();
+  const auto quoted = QStringLiteral("\"%1\"").arg(path);
+
+#ifdef Q_OS_WIN
+  if (suffix == QStringLiteral("bat") || suffix == QStringLiteral("cmd"))
+    return QStringLiteral("cmd.exe /c %1").arg(quoted);
+  if (suffix == QStringLiteral("ps1"))
+    return QStringLiteral("powershell.exe -NoProfile -File %1").arg(quoted);
+  if (suffix == QStringLiteral("py"))
+    return QStringLiteral("python.exe %1").arg(quoted);
+#else
+  if (suffix == QStringLiteral("sh") || suffix == QStringLiteral("command"))
+    return QStringLiteral("/bin/sh %1").arg(quoted);
+  if (suffix == QStringLiteral("bash"))
+    return QStringLiteral("/bin/bash %1").arg(quoted);
+  if (suffix == QStringLiteral("zsh"))
+    return QStringLiteral("/bin/zsh %1").arg(quoted);
+  if (suffix == QStringLiteral("py"))
+    return QStringLiteral("python3 %1").arg(quoted);
+#endif
+
+  return quoted;
+}
+
+} // namespace
+
 SettingsDialog::SettingsDialog(QWidget *parent, const ServerConfig &serverConfig)
     : QDialog(parent),
       ui{std::make_unique<Ui::SettingsDialog>()},
@@ -38,6 +69,10 @@ SettingsDialog::SettingsDialog(QWidget *parent, const ServerConfig &serverConfig
   // these are enabled by the control next to them
   ui->lineCommandEnter->setEnabled(false);
   ui->lineCommandExit->setEnabled(false);
+  ui->lineCommandUnlock->setEnabled(false);
+  ui->lineCommandLock->setEnabled(false);
+  ui->btnBrowseUnlockCommand->setEnabled(false);
+  ui->btnBrowseLockCommand->setEnabled(false);
 
   // set up the language combo
   I18N::reDetectLanguages();
@@ -103,6 +138,10 @@ void SettingsDialog::initConnections() const
 
   connect(ui->cbRunEnterCommand, &QCheckBox::toggled, ui->lineCommandEnter, &QLineEdit::setEnabled);
   connect(ui->cbRunExitCommand, &QCheckBox::toggled, ui->lineCommandExit, &QLineEdit::setEnabled);
+  connect(ui->cbRunUnlockCommand, &QCheckBox::toggled, ui->lineCommandUnlock, &QLineEdit::setEnabled);
+  connect(ui->cbRunUnlockCommand, &QCheckBox::toggled, ui->btnBrowseUnlockCommand, &QPushButton::setEnabled);
+  connect(ui->cbRunLockCommand, &QCheckBox::toggled, ui->lineCommandLock, &QLineEdit::setEnabled);
+  connect(ui->cbRunLockCommand, &QCheckBox::toggled, ui->btnBrowseLockCommand, &QPushButton::setEnabled);
 
   connect(ui->groupSecurity, &QGroupBox::toggled, this, &SettingsDialog::updateTlsControlsEnabled);
   connect(ui->groupService, &QGroupBox::toggled, this, &SettingsDialog::updateControls);
@@ -111,6 +150,8 @@ void SettingsDialog::initConnections() const
   connect(ui->comboTlsKeyLength, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateRequestedKeySize);
   connect(ui->btnTlsCertPath, &QPushButton::clicked, this, &SettingsDialog::browseCertificatePath);
   connect(ui->btnBrowseLog, &QPushButton::clicked, this, &SettingsDialog::browseLogPath);
+  connect(ui->btnBrowseUnlockCommand, &QPushButton::clicked, this, &SettingsDialog::browseUnlockCommand);
+  connect(ui->btnBrowseLockCommand, &QPushButton::clicked, this, &SettingsDialog::browseLockCommand);
   connect(ui->groupLogToFile, &QGroupBox::toggled, this, &SettingsDialog::setLogToFile);
   connect(ui->comboLogLevel, &QComboBox::currentIndexChanged, this, &SettingsDialog::logLevelChanged);
   connect(ui->comboLanguage, &QComboBox::currentTextChanged, this, [](const QString &lang) {
@@ -138,6 +179,11 @@ void SettingsDialog::initConnections() const
   connect(ui->groupSecurity, &QGroupBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->lineLogFilename, &QLineEdit::textChanged, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->lineTlsCertPath, &QLineEdit::textChanged, this, &SettingsDialog::setButtonBoxEnabledButtons);
+  connect(ui->cbAutoShareOnUnlock, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
+  connect(ui->cbRunUnlockCommand, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
+  connect(ui->cbRunLockCommand, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
+  connect(ui->lineCommandUnlock, &QLineEdit::textChanged, this, &SettingsDialog::setButtonBoxEnabledButtons);
+  connect(ui->lineCommandLock, &QLineEdit::textChanged, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->cbRunEnterCommand, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->cbRunExitCommand, &QCheckBox::toggled, this, &SettingsDialog::setButtonBoxEnabledButtons);
   connect(ui->lineCommandEnter, &QLineEdit::textChanged, this, &SettingsDialog::setButtonBoxEnabledButtons);
@@ -180,6 +226,26 @@ void SettingsDialog::browseLogPath()
   if (!fileName.isEmpty()) {
     ui->lineLogFilename->setText(fileName);
   }
+}
+
+void SettingsDialog::browseUnlockCommand()
+{
+  const auto file = QFileDialog::getOpenFileName(
+      this, tr("Select Script File"), QDir::homePath(),
+      tr("Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;All files (*)")
+  );
+  if (!file.isEmpty())
+    ui->lineCommandUnlock->setText(scriptCommand(file));
+}
+
+void SettingsDialog::browseLockCommand()
+{
+  const auto file = QFileDialog::getOpenFileName(
+      this, tr("Select Script File"), QDir::homePath(),
+      tr("Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;All files (*)")
+  );
+  if (!file.isEmpty())
+    ui->lineCommandLock->setText(scriptCommand(file));
 }
 
 void SettingsDialog::setLogToFile(bool logToFile)
@@ -240,8 +306,13 @@ void SettingsDialog::accept()
   Settings::setValue(Settings::Gui::ShowVersionInTitle, ui->cbShowVersion->isChecked());
   Settings::setValue(Settings::Core::EnableEnterCommand, ui->cbRunEnterCommand->isChecked());
   Settings::setValue(Settings::Core::EnableExitCommand, ui->cbRunExitCommand->isChecked());
+  Settings::setValue(Settings::Core::AutoShareOnUnlock, ui->cbAutoShareOnUnlock->isChecked());
+  Settings::setValue(Settings::Core::EnableUnlockCommand, ui->cbRunUnlockCommand->isChecked());
+  Settings::setValue(Settings::Core::EnableLockCommand, ui->cbRunLockCommand->isChecked());
   Settings::setValue(Settings::Core::ComputerEnterCommand, ui->lineCommandEnter->text());
   Settings::setValue(Settings::Core::ComputerExitCommand, ui->lineCommandExit->text());
+  Settings::setValue(Settings::Core::UnlockCommand, ui->lineCommandUnlock->text());
+  Settings::setValue(Settings::Core::LockCommand, ui->lineCommandLock->text());
 
   Settings::ProcessMode mode;
   if (ui->groupService->isChecked())
@@ -268,8 +339,13 @@ void SettingsDialog::loadFromConfig()
   ui->cbShowVersion->setChecked(Settings::value(Settings::Gui::ShowVersionInTitle).toBool());
   ui->cbRunEnterCommand->setChecked(Settings::value(Settings::Core::EnableEnterCommand).toBool());
   ui->cbRunExitCommand->setChecked(Settings::value(Settings::Core::EnableExitCommand).toBool());
+  ui->cbAutoShareOnUnlock->setChecked(Settings::value(Settings::Core::AutoShareOnUnlock).toBool());
+  ui->cbRunUnlockCommand->setChecked(Settings::value(Settings::Core::EnableUnlockCommand).toBool());
+  ui->cbRunLockCommand->setChecked(Settings::value(Settings::Core::EnableLockCommand).toBool());
   ui->lineCommandEnter->setText(Settings::value(Settings::Core::ComputerEnterCommand).toString());
   ui->lineCommandExit->setText(Settings::value(Settings::Core::ComputerExitCommand).toString());
+  ui->lineCommandUnlock->setText(Settings::value(Settings::Core::UnlockCommand).toString());
+  ui->lineCommandLock->setText(Settings::value(Settings::Core::LockCommand).toString());
 
   const auto processMode = Settings::value(Settings::Core::ProcessMode).value<Settings::ProcessMode>();
   ui->groupService->setChecked(processMode == Settings::ProcessMode::Service);
@@ -390,6 +466,13 @@ void SettingsDialog::updateControls()
   ui->cbRunExitCommand->setEnabled(writable);
   ui->lineCommandEnter->setEnabled(writable && ui->cbRunEnterCommand->isChecked());
   ui->lineCommandExit->setEnabled(writable && ui->cbRunExitCommand->isChecked());
+  ui->cbAutoShareOnUnlock->setEnabled(writable && Settings::isAutoShareOnUnlockAvailable());
+  ui->cbRunUnlockCommand->setEnabled(writable);
+  ui->cbRunLockCommand->setEnabled(writable);
+  ui->lineCommandUnlock->setEnabled(writable && ui->cbRunUnlockCommand->isChecked());
+  ui->lineCommandLock->setEnabled(writable && ui->cbRunLockCommand->isChecked());
+  ui->btnBrowseUnlockCommand->setEnabled(writable && ui->cbRunUnlockCommand->isChecked());
+  ui->btnBrowseLockCommand->setEnabled(writable && ui->cbRunLockCommand->isChecked());
 
   // Portable mode only ever applies to Windows.
   // Daemon options should only be available on Windows when *not* in portable mode.
@@ -440,8 +523,13 @@ bool SettingsDialog::isModified() const
       (ui->comboTlsKeyLength->currentText() != Settings::value(Settings::Security::KeySize).toString()) ||
       (ui->groupSecurity->isChecked() != Settings::value(Settings::Security::TlsEnabled).toBool()) ||
       (ui->cbRequireClientCert->isChecked() != Settings::value(Settings::Security::CheckPeers).toBool()) ||
+      (ui->cbAutoShareOnUnlock->isChecked() != Settings::value(Settings::Core::AutoShareOnUnlock).toBool()) ||
+      (ui->cbRunUnlockCommand->isChecked() != Settings::value(Settings::Core::EnableUnlockCommand).toBool()) ||
+      (ui->cbRunLockCommand->isChecked() != Settings::value(Settings::Core::EnableLockCommand).toBool()) ||
       (ui->cbRunEnterCommand->isChecked() != Settings::value(Settings::Core::EnableEnterCommand).toBool()) ||
       (ui->cbRunExitCommand->isChecked() != Settings::value(Settings::Core::EnableExitCommand).toBool()) ||
+      (ui->lineCommandUnlock->text() != Settings::value(Settings::Core::UnlockCommand).toString()) ||
+      (ui->lineCommandLock->text() != Settings::value(Settings::Core::LockCommand).toString()) ||
       (ui->lineCommandEnter->text() != Settings::value(Settings::Core::ComputerEnterCommand).toString()) ||
       (ui->lineCommandExit->text() != Settings::value(Settings::Core::ComputerExitCommand).toString()) ||
       (I18N::nativeTo639Name(ui->comboLanguage->currentText()) != Settings::value(Settings::Core::Language).toString());
@@ -476,6 +564,11 @@ bool SettingsDialog::isDefault() const
       (ui->comboTlsKeyLength->currentText() == Settings::defaultValue(Settings::Security::KeySize).toString()) &&
       (ui->groupSecurity->isChecked() == Settings::defaultValue(Settings::Security::TlsEnabled).toBool()) &&
       (ui->cbRequireClientCert->isChecked() == Settings::defaultValue(Settings::Security::CheckPeers).toBool()) &&
+      (ui->cbAutoShareOnUnlock->isChecked() == Settings::defaultValue(Settings::Core::AutoShareOnUnlock).toBool()) &&
+      (ui->cbRunUnlockCommand->isChecked() == Settings::defaultValue(Settings::Core::EnableUnlockCommand).toBool()) &&
+      (ui->cbRunLockCommand->isChecked() == Settings::defaultValue(Settings::Core::EnableLockCommand).toBool()) &&
+      (ui->lineCommandUnlock->text() == Settings::defaultValue(Settings::Core::UnlockCommand).toString()) &&
+      (ui->lineCommandLock->text() == Settings::defaultValue(Settings::Core::LockCommand).toString()) &&
       (ui->lineCommandEnter->text() == Settings::defaultValue(Settings::Core::ComputerEnterCommand).toString()) &&
       (ui->lineCommandExit->text() == Settings::defaultValue(Settings::Core::ComputerExitCommand).toString()) &&
       (ui->cbRunEnterCommand->isChecked() == Settings::defaultValue(Settings::Core::EnableEnterCommand).toBool()) &&
@@ -499,8 +592,13 @@ void SettingsDialog::resetToDefault()
   ui->cbShowVersion->setChecked(Settings::defaultValue(Settings::Gui::ShowVersionInTitle).toBool());
   ui->cbRunEnterCommand->setChecked(Settings::defaultValue(Settings::Core::EnableEnterCommand).toBool());
   ui->cbRunExitCommand->setChecked(Settings::defaultValue(Settings::Core::EnableExitCommand).toBool());
+  ui->cbAutoShareOnUnlock->setChecked(Settings::defaultValue(Settings::Core::AutoShareOnUnlock).toBool());
+  ui->cbRunUnlockCommand->setChecked(Settings::defaultValue(Settings::Core::EnableUnlockCommand).toBool());
+  ui->cbRunLockCommand->setChecked(Settings::defaultValue(Settings::Core::EnableLockCommand).toBool());
   ui->lineCommandEnter->setText(Settings::defaultValue(Settings::Core::ComputerEnterCommand).toString());
   ui->lineCommandExit->setText(Settings::defaultValue(Settings::Core::ComputerExitCommand).toString());
+  ui->lineCommandUnlock->setText(Settings::defaultValue(Settings::Core::UnlockCommand).toString());
+  ui->lineCommandLock->setText(Settings::defaultValue(Settings::Core::LockCommand).toString());
 
   const auto autoHide = Settings::defaultValue(Settings::Gui::Autohide).toBool();
   ui->rbCloseToTray->setChecked(autoHide);

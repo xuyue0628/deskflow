@@ -191,6 +191,11 @@ void CoreProcess::onProcessFinished(int exitCode, QProcess::ExitStatus)
 
   qDebug("desktop process exited normally");
 
+  if (!m_autoRestartEnabled) {
+    setProcessState(Stopped);
+    return;
+  }
+
   if (const auto wasStarted = m_processState == Started; wasStarted) {
     qDebug("desktop process was running, retrying in %d ms", kRetryDelay);
     setProcessState(RetryPending);

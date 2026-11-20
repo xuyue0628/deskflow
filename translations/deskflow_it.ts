@@ -1281,11 +1281,47 @@ L&apos;abilitazione di questa impostazione disabiliterà l&apos;interfaccia graf
     </message>
     <message>
         <source>Run command on enter</source>
-        <translation type="unfinished">Esegui il comando alla pressione di Invio</translation>
+        <translation type="unfinished">Esegui comando quando si entra nel computer client</translation>
     </message>
     <message>
         <source>Run command on exit</source>
-        <translation type="unfinished">Esegui comando all&apos;uscita</translation>
+        <translation type="unfinished">Esegui comando quando si esce dal computer client</translation>
+    </message>
+    <message>
+        <source>Enable remote input capture sharing by default when this computer unlocks</source>
+        <translation type="unfinished">Abilita per impostazione predefinita la condivisione con cattura remota dell&apos;input allo sblocco di questo computer</translation>
+    </message>
+    <message>
+        <source>Start sharing when this computer unlocks and stop sharing when it locks.</source>
+        <translation type="unfinished">Avvia la condivisione allo sblocco di questo computer e interrompila al blocco.</translation>
+    </message>
+    <message>
+        <source>Run command when this computer unlocks</source>
+        <translation type="unfinished">Esegui comando allo sblocco di questo computer</translation>
+    </message>
+    <message>
+        <source>Run command when this computer locks</source>
+        <translation type="unfinished">Esegui comando al blocco di questo computer</translation>
+    </message>
+    <message>
+        <source>Command or path to a script</source>
+        <translation type="unfinished">Comando o percorso di uno script</translation>
+    </message>
+    <message>
+        <source>Select a script file</source>
+        <translation type="unfinished">Seleziona un file di script</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation type="unfinished">Sfoglia...</translation>
+    </message>
+    <message>
+        <source>Select Script File</source>
+        <translation type="unfinished">Seleziona file di script</translation>
+    </message>
+    <message>
+        <source>Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;All files (*)</source>
+        <translation type="unfinished">Script (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;Tutti i file (*)</translation>
     </message>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>

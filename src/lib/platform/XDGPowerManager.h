@@ -7,12 +7,20 @@
 
 #pragma once
 
+#include <QObject>
+#include <QStringList>
+#include <QVariantMap>
+
 #include <string>
 
-class XDGPowerManager
+class IEventQueue;
+
+class XDGPowerManager : public QObject
 {
+  Q_OBJECT
+
 public:
-  XDGPowerManager() = default;
+  explicit XDGPowerManager(QObject *parent = nullptr);
   ~XDGPowerManager();
 
   /**
@@ -25,6 +33,11 @@ public:
    */
   void enableSleep() const;
 
+  /**
+   * @brief Forward desktop screen-lock signals to the event queue.
+   */
+  void watchScreenLock(IEventQueue *events = nullptr, void *eventTarget = nullptr);
+
   XDGPowerManager(const XDGPowerManager &) = delete;
   XDGPowerManager &operator=(const XDGPowerManager &) = delete;
 
@@ -34,4 +47,19 @@ public:
     kSessionManager
   };
   static bool inhibitScreenCall(InhibitScreenServices serviceID, bool state, std::string &error);
+
+Q_SIGNALS:
+  void screenLockChanged(bool locked);
+
+private Q_SLOTS:
+  void handleScreenSaverActiveChanged(bool active);
+  void handleSessionLocked();
+  void handleSessionUnlocked();
+  void handleSessionPropertiesChanged(const QString &interface, const QVariantMap &properties, const QStringList &);
+
+private:
+  void updateLockState(bool locked);
+  IEventQueue *m_events = nullptr;
+  void *m_eventTarget = nullptr;
+  bool m_screenLocked = false;
 };

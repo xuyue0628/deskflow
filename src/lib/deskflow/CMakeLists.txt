@@ -33,6 +33,8 @@ add_library(${lib_name} STATIC ${PLATFORM_CODE}
   Chunk.h
   ClientApp.cpp
   ClientApp.h
+  CommandRunner.cpp
+  CommandRunner.h
   ClipboardTypes.h
   Clipboard.cpp
   Clipboard.h

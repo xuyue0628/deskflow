@@ -1281,11 +1281,47 @@ Enabling this setting will disable the server config GUI.</source>
     </message>
     <message>
         <source>Run command on enter</source>
-        <translation type="unfinished">Enter 키를 누르면 명령 실행</translation>
+        <translation type="unfinished">클라이언트 컴퓨터에 진입할 때 명령 실행</translation>
     </message>
     <message>
         <source>Run command on exit</source>
-        <translation type="unfinished">종료 시 명령 실행</translation>
+        <translation type="unfinished">클라이언트 컴퓨터에서 나갈 때 명령 실행</translation>
+    </message>
+    <message>
+        <source>Enable remote input capture sharing by default when this computer unlocks</source>
+        <translation type="unfinished">이 컴퓨터의 잠금을 해제할 때 기본적으로 원격 입력 캡처 공유 사용</translation>
+    </message>
+    <message>
+        <source>Start sharing when this computer unlocks and stop sharing when it locks.</source>
+        <translation type="unfinished">이 컴퓨터의 잠금을 해제하면 공유를 시작하고 잠기면 중지합니다.</translation>
+    </message>
+    <message>
+        <source>Run command when this computer unlocks</source>
+        <translation type="unfinished">이 컴퓨터의 잠금을 해제할 때 명령 실행</translation>
+    </message>
+    <message>
+        <source>Run command when this computer locks</source>
+        <translation type="unfinished">이 컴퓨터가 잠길 때 명령 실행</translation>
+    </message>
+    <message>
+        <source>Command or path to a script</source>
+        <translation type="unfinished">명령 또는 스크립트 경로</translation>
+    </message>
+    <message>
+        <source>Select a script file</source>
+        <translation type="unfinished">스크립트 파일 선택</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation type="unfinished">찾아보기...</translation>
+    </message>
+    <message>
+        <source>Select Script File</source>
+        <translation type="unfinished">스크립트 파일 선택</translation>
+    </message>
+    <message>
+        <source>Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;All files (*)</source>
+        <translation type="unfinished">스크립트 (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;모든 파일 (*)</translation>
     </message>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>

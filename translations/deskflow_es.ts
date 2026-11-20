@@ -1281,11 +1281,47 @@ Al habilitar esta opción, se deshabilitará la interfaz gráfica de usuario (GU
     </message>
     <message>
         <source>Run command on enter</source>
-        <translation type="unfinished">Ejecutar comando al presionar Enter</translation>
+        <translation type="unfinished">Ejecutar comando al entrar en el equipo cliente</translation>
     </message>
     <message>
         <source>Run command on exit</source>
-        <translation type="unfinished">Ejecutar comando al salir</translation>
+        <translation type="unfinished">Ejecutar comando al salir del equipo cliente</translation>
+    </message>
+    <message>
+        <source>Enable remote input capture sharing by default when this computer unlocks</source>
+        <translation type="unfinished">Habilitar por defecto el uso compartido con captura remota de entrada al desbloquear este equipo</translation>
+    </message>
+    <message>
+        <source>Start sharing when this computer unlocks and stop sharing when it locks.</source>
+        <translation type="unfinished">Iniciar el uso compartido al desbloquear este equipo y detenerlo al bloquearlo.</translation>
+    </message>
+    <message>
+        <source>Run command when this computer unlocks</source>
+        <translation type="unfinished">Ejecutar comando al desbloquear este equipo</translation>
+    </message>
+    <message>
+        <source>Run command when this computer locks</source>
+        <translation type="unfinished">Ejecutar comando al bloquear este equipo</translation>
+    </message>
+    <message>
+        <source>Command or path to a script</source>
+        <translation type="unfinished">Comando o ruta a un script</translation>
+    </message>
+    <message>
+        <source>Select a script file</source>
+        <translation type="unfinished">Seleccionar un archivo de script</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation type="unfinished">Examinar...</translation>
+    </message>
+    <message>
+        <source>Select Script File</source>
+        <translation type="unfinished">Seleccionar archivo de script</translation>
+    </message>
+    <message>
+        <source>Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;All files (*)</source>
+        <translation type="unfinished">Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;Todos los archivos (*)</translation>
     </message>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>

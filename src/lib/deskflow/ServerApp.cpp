@@ -15,6 +15,7 @@
 #include "common/PlatformInfo.h"
 #include "common/Settings.h"
 #include "deskflow/App.h"
+#include "deskflow/CommandRunner.h"
 #include "deskflow/Computer.h"
 #include "deskflow/DisplayException.h"
 #include "deskflow/ProtocolTypes.h"
@@ -58,7 +59,14 @@ using namespace deskflow::server;
 ServerApp::ServerApp(IEventQueue *events, const QString &processName) : App(events, processName)
 {
   m_name = Settings::value(Settings::Core::ComputerName).toString().toStdString();
-  // do nothing
+#ifndef Q_OS_LINUX
+  getEvents()->addHandler(EventTypes::ServerAppScreenLocked, getEvents()->getSystemTarget(), [this](const auto &) {
+    handleScreenLock();
+  });
+  getEvents()->addHandler(EventTypes::ServerAppScreenUnlocked, getEvents()->getSystemTarget(), [this](const auto &) {
+    handleScreenUnlock();
+  });
+#endif
 }
 
 void ServerApp::parseArgs()
@@ -223,6 +231,10 @@ void ServerApp::closeServerComputer(deskflow::Computer *computer)
     getEvents()->removeHandler(ComputerError, computer->getEventTarget());
     getEvents()->removeHandler(ComputerSuspend, computer->getEventTarget());
     getEvents()->removeHandler(ComputerResume, computer->getEventTarget());
+#ifndef Q_OS_LINUX
+    getEvents()->removeHandler(PrimaryScreenSaverActivated, computer->getEventTarget());
+    getEvents()->removeHandler(PrimaryScreenSaverDeactivated, computer->getEventTarget());
+#endif
     delete computer;
   }
 }
@@ -341,6 +353,20 @@ deskflow::Computer *ServerApp::openServerComputer()
   getEvents()->addHandler(EventTypes::ComputerResume, computer->getEventTarget(), [this](const auto &) {
     handleResume();
   });
+#ifndef Q_OS_LINUX
+  getEvents()->addHandler(
+      EventTypes::PrimaryScreenSaverActivated, computer->getEventTarget(),
+      [this](const auto &) {
+        getEvents()->addEvent(Event(EventTypes::ServerAppScreenLocked, getEvents()->getSystemTarget()));
+      }
+  );
+  getEvents()->addHandler(
+      EventTypes::PrimaryScreenSaverDeactivated, computer->getEventTarget(),
+      [this](const auto &) {
+        getEvents()->addEvent(Event(EventTypes::ServerAppScreenUnlocked, getEvents()->getSystemTarget()));
+      }
+  );
+#endif
   return computer;
 }
 
@@ -376,6 +402,11 @@ bool ServerApp::startServer()
     LOG_DEBUG("started server, waiting for clients");
     ipcSendConnectionState(deskflow::core::ConnectionState::Listening);
     m_serverState = Started;
+#ifndef Q_OS_LINUX
+    if (Settings::isAutoShareOnUnlockAvailable() &&
+        Settings::value(Settings::Core::AutoShareOnUnlock).toBool())
+      runUnlockCommand();
+#endif
     return true;
   } catch (SocketAddressInUseException &e) {
     LOG_CRIT("cannot listen for clients: %s", e.what());
@@ -438,6 +469,62 @@ void ServerApp::handleResume()
     startServer();
     m_suspended = false;
   }
+}
+
+void ServerApp::handleScreenLock()
+{
+  if (m_pausedForScreenLock)
+    return;
+
+  using enum ServerState;
+  if (Settings::isAutoShareOnUnlockAvailable() &&
+      Settings::value(Settings::Core::AutoShareOnUnlock).toBool() &&
+      (m_serverState == Started || m_serverState == Starting)) {
+    LOG_INFO("screen locked, pausing remote input capture sharing");
+    stopServer();
+    ipcSendConnectionState(deskflow::core::ConnectionState::Disconnected);
+    m_pausedForScreenLock = true;
+  }
+
+  runLockCommand();
+}
+
+void ServerApp::handleScreenUnlock()
+{
+  auto resumedByAutoShare = false;
+  if (m_pausedForScreenLock) {
+    m_pausedForScreenLock = false;
+    if (Settings::isAutoShareOnUnlockAvailable() &&
+        Settings::value(Settings::Core::AutoShareOnUnlock).toBool()) {
+      LOG_INFO("system unlock, starting remote input capture sharing");
+      resumedByAutoShare = startServer();
+    }
+  }
+
+  if (!resumedByAutoShare)
+    runUnlockCommand();
+}
+
+void ServerApp::runUnlockCommand() const
+{
+  if (!Settings::value(Settings::Core::EnableUnlockCommand).toBool())
+    return;
+
+  const auto commandLine = Settings::value(Settings::Core::UnlockCommand).toString().trimmed();
+  LOG_INFO("running system unlock command: %s", qPrintable(commandLine));
+  if (!deskflow::runDetachedCommand(commandLine))
+    LOG_ERR("failed to run system unlock command");
+}
+
+void ServerApp::runLockCommand() const
+{
+  if (!Settings::value(Settings::Core::EnableLockCommand).toBool())
+    return;
+
+  const auto commandLine = Settings::value(Settings::Core::LockCommand).toString().trimmed();
+  LOG_INFO("running system lock command: %s", qPrintable(commandLine));
+  if (!deskflow::runDetachedCommand(commandLine))
+    LOG_ERR("failed to run system lock command");
 }
 
 ClientListener *ServerApp::openClientListener(const NetworkAddress &address)

@@ -83,6 +83,10 @@ public:
   PrimaryClient *openPrimaryClient(const std::string &name, deskflow::Computer *computer);
   void handleSuspend();
   void handleResume();
+  void handleScreenLock();
+  void handleScreenUnlock();
+  void runUnlockCommand() const;
+  void runLockCommand() const;
   ClientListener *openClientListener(const NetworkAddress &address);
   Server *openServer(ServerConfig &config, PrimaryClient *primaryClient);
   bool startServer();
@@ -107,6 +111,7 @@ private:
   NetworkAddress getAddress(const NetworkAddress &address) const;
 
   bool m_suspended = false;
+  bool m_pausedForScreenLock = false;
   Server *m_server = nullptr;
   ServerState m_serverState = ServerState::Uninitialized;
   deskflow::Computer *m_serverComputer = nullptr;

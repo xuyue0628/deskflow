@@ -30,6 +30,9 @@
 #include "gui/ipc/DaemonIpcClient.h"
 #include "gui/widgets/LogDock.h"
 #include "net/FingerprintDatabase.h"
+#ifdef Q_OS_LINUX
+#include "platform/XDGPowerManager.h"
+#endif
 #include "widgets/StatusBar.h"
 
 #include <QCheckBox>
@@ -84,6 +87,12 @@ MainWindow::MainWindow()
       m_networkMonitor{new NetworkMonitor(this)}
 {
   ui->setupUi(this);
+
+#ifdef Q_OS_LINUX
+  m_screenLockMonitor = new XDGPowerManager(this);
+  connect(m_screenLockMonitor, &XDGPowerManager::screenLockChanged, this, &MainWindow::systemLockChanged);
+  m_screenLockMonitor->watchScreenLock();
+#endif
 
   setWindowIcon(QIcon::fromTheme(kRevFqdnName));
 
@@ -660,7 +669,14 @@ void MainWindow::open()
     qDebug() << "skipping check for new version, disabled";
   }
 
-  if (Settings::value(Settings::Gui::AutoStartCore).toBool()) {
+  const auto autoShareOnUnlock =
+      Settings::value(Settings::Core::CoreMode) == Settings::CoreMode::Server &&
+      Settings::isAutoShareOnUnlockAvailable() &&
+      Settings::value(Settings::Core::AutoShareOnUnlock).toBool();
+  if (autoShareOnUnlock) {
+    startCore();
+    runSystemUnlockCommand();
+  } else if (Settings::value(Settings::Gui::AutoStartCore).toBool()) {
     startCore();
   }
 }
@@ -1248,6 +1264,64 @@ void MainWindow::daemonIpcClientConnectionFailed()
   if (deskflow::gui::messages::showDaemonOffline(this)) {
     m_coreProcess.retryDaemon();
   }
+}
+
+void MainWindow::systemLockChanged(bool locked)
+{
+  if (locked) {
+    if (Settings::isAutoShareOnUnlockAvailable() &&
+        Settings::value(Settings::Core::AutoShareOnUnlock).toBool() &&
+        m_coreProcess.mode() == CoreMode::Server) {
+      m_coreProcess.setAutoRestartEnabled(false);
+      stopCore();
+    }
+    runSystemLockCommand();
+    return;
+  }
+
+  if (Settings::isAutoShareOnUnlockAvailable() &&
+      Settings::value(Settings::Core::AutoShareOnUnlock).toBool() &&
+      m_coreProcess.mode() == CoreMode::Server) {
+    m_coreProcess.setAutoRestartEnabled(true);
+    startCore();
+  }
+  runSystemUnlockCommand();
+}
+
+void MainWindow::runSystemLockCommand() const
+{
+  if (!Settings::value(Settings::Core::EnableLockCommand).toBool())
+    return;
+
+  const auto commandLine = Settings::value(Settings::Core::LockCommand).toString().trimmed();
+  qInfo().noquote() << "running system lock command:" << commandLine;
+  auto arguments = QProcess::splitCommand(commandLine);
+  if (arguments.isEmpty()) {
+    qWarning("system lock command is empty");
+    return;
+  }
+
+  const auto program = arguments.takeFirst();
+  if (!QProcess::startDetached(program, arguments))
+    qWarning().noquote() << "failed to start system lock command:" << commandLine;
+}
+
+void MainWindow::runSystemUnlockCommand() const
+{
+  if (!Settings::value(Settings::Core::EnableUnlockCommand).toBool())
+    return;
+
+  const auto commandLine = Settings::value(Settings::Core::UnlockCommand).toString().trimmed();
+  qInfo().noquote() << "running system unlock command:" << commandLine;
+  auto arguments = QProcess::splitCommand(commandLine);
+  if (arguments.isEmpty()) {
+    qWarning("system unlock command is empty");
+    return;
+  }
+
+  const auto program = arguments.takeFirst();
+  if (!QProcess::startDetached(program, arguments))
+    qWarning().noquote() << "failed to start system unlock command:" << commandLine;
 }
 
 void MainWindow::toggleCanRunCore(bool enableButtons)

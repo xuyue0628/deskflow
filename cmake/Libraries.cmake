@@ -113,12 +113,20 @@ macro(configure_xorg_libs)
   check_include_files("X11/extensions/Xinerama.h"
                       HAVE_X11_EXTENSIONS_XINERAMA_H)
   check_include_files("X11/extensions/XKB.h" HAVE_XKB_EXTENSION)
+  check_include_files("stdio.h;X11/XKBlib.h;X11/extensions/XKBrules.h"
+                      HAVE_X11_EXTENSIONS_XKBRULES_H)
   check_include_files("X11/extensions/XTest.h" HAVE_X11_EXTENSIONS_XTEST_H)
   check_include_files("${XKBlib}" HAVE_X11_XKBLIB_H)
   check_include_files("X11/extensions/XInput2.h" HAVE_XI2)
 
   if(NOT HAVE_X11_XKBLIB_H)
     message(FATAL_ERROR "Missing header: " ${XKBlib})
+  endif()
+
+  if(NOT HAVE_X11_EXTENSIONS_XKBRULES_H)
+    message(FATAL_ERROR
+      "Missing header: X11/extensions/XKBrules.h. "
+      "On Debian/Ubuntu install libxkbfile-dev.")
   endif()
 
   # Set library path and -L flag for BSD-derived systems.
@@ -167,12 +175,15 @@ macro(configure_xorg_libs)
     list(APPEND libs Xext)
   endif()
 
-  if(HAVE_Xinerama)
+  if(HAVE_Xinerama AND HAVE_X11_EXTENSIONS_XINERAMA_H)
     list(APPEND libs Xinerama)
-  else(HAVE_Xinerama)
-    if(HAVE_X11_EXTENSIONS_XINERAMA_H)
-      set(HAVE_X11_EXTENSIONS_XINERAMA_H 0)
-      message(WARNING "Old Xinerama implementation detected, disabled")
+  else()
+    set(xinerama_headers_available "${HAVE_X11_EXTENSIONS_XINERAMA_H}")
+    set(HAVE_X11_EXTENSIONS_XINERAMA_H 0)
+    if(NOT xinerama_headers_available)
+      message(STATUS "Xinerama headers not found; Xinerama support disabled")
+    elseif(NOT HAVE_Xinerama)
+      message(WARNING "Xinerama library not found; Xinerama support disabled")
     endif()
   endif()
 

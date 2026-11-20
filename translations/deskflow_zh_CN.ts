@@ -1283,11 +1283,47 @@ Enabling this setting will disable the server config GUI.</source>
     </message>
     <message>
         <source>Run command on enter</source>
-        <translation type="unfinished">按下回车键执行命令</translation>
+        <translation type="unfinished">进入客户端电脑时运行</translation>
     </message>
     <message>
         <source>Run command on exit</source>
-        <translation type="unfinished">退出时运行命令</translation>
+        <translation type="unfinished">离开客户端电脑时运行</translation>
+    </message>
+    <message>
+        <source>Enable remote input capture sharing by default when this computer unlocks</source>
+        <translation type="unfinished">本机系统解锁时默认开启远程输入捕获分享</translation>
+    </message>
+    <message>
+        <source>Start sharing when this computer unlocks and stop sharing when it locks.</source>
+        <translation type="unfinished">本机系统解锁时开启分享，锁定时关闭分享。</translation>
+    </message>
+    <message>
+        <source>Run command when this computer unlocks</source>
+        <translation type="unfinished">本机系统解锁时运行</translation>
+    </message>
+    <message>
+        <source>Run command when this computer locks</source>
+        <translation type="unfinished">本机系统锁定时运行</translation>
+    </message>
+    <message>
+        <source>Command or path to a script</source>
+        <translation type="unfinished">命令或脚本文件路径</translation>
+    </message>
+    <message>
+        <source>Select a script file</source>
+        <translation type="unfinished">选择脚本文件</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation type="unfinished">浏览...</translation>
+    </message>
+    <message>
+        <source>Select Script File</source>
+        <translation type="unfinished">选择脚本文件</translation>
+    </message>
+    <message>
+        <source>Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;All files (*)</source>
+        <translation type="unfinished">脚本 (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;所有文件 (*)</translation>
     </message>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>

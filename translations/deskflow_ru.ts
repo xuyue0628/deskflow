@@ -1279,11 +1279,47 @@ Enabling this setting will disable the server config GUI.</source>
     </message>
     <message>
         <source>Run command on enter</source>
-        <translation type="unfinished">Выполнять команду по нажатию Enter</translation>
+        <translation type="unfinished">Выполнять команду при переходе на компьютер-клиент</translation>
     </message>
     <message>
         <source>Run command on exit</source>
-        <translation type="unfinished">Выполнить команду при выходе</translation>
+        <translation type="unfinished">Выполнять команду при выходе с компьютера-клиента</translation>
+    </message>
+    <message>
+        <source>Enable remote input capture sharing by default when this computer unlocks</source>
+        <translation type="unfinished">По умолчанию включать общий доступ с удалённым захватом ввода при разблокировке этого компьютера</translation>
+    </message>
+    <message>
+        <source>Start sharing when this computer unlocks and stop sharing when it locks.</source>
+        <translation type="unfinished">Запускать общий доступ при разблокировке этого компьютера и останавливать его при блокировке.</translation>
+    </message>
+    <message>
+        <source>Run command when this computer unlocks</source>
+        <translation type="unfinished">Выполнять команду при разблокировке этого компьютера</translation>
+    </message>
+    <message>
+        <source>Run command when this computer locks</source>
+        <translation type="unfinished">Выполнять команду при блокировке этого компьютера</translation>
+    </message>
+    <message>
+        <source>Command or path to a script</source>
+        <translation type="unfinished">Команда или путь к сценарию</translation>
+    </message>
+    <message>
+        <source>Select a script file</source>
+        <translation type="unfinished">Выбрать файл сценария</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation type="unfinished">Обзор...</translation>
+    </message>
+    <message>
+        <source>Select Script File</source>
+        <translation type="unfinished">Выбрать файл сценария</translation>
+    </message>
+    <message>
+        <source>Scripts (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;All files (*)</source>
+        <translation type="unfinished">Сценарии (*.sh *.bash *.zsh *.py *.cmd *.bat *.ps1 *.command);;Все файлы (*)</translation>
     </message>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>

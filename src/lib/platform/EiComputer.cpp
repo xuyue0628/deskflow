@@ -85,6 +85,9 @@ EiComputer::EiComputer(bool isPrimary, IEventQueue *events, bool usePortal)
     m_clipboard = new EiClipboard(kClipboardClipboard);
   }
 
+  if (isPrimary)
+    m_powerManager.watchScreenLock(events, getEventTarget());
+
   // disable sleep if the flag is set
   if (Settings::value(Settings::Core::PreventSleep).toBool()) {
     m_powerManager.disableSleep();

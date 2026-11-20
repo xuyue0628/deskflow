@@ -8,38 +8,10 @@
 #include "deskflow/Computer.h"
 #include "base/IEventQueue.h"
 #include "base/Log.h"
+#include "deskflow/CommandRunner.h"
 #include "deskflow/IPlatformComputer.h"
 
-#include <QProcess>
-
-#ifdef Q_OS_WIN
-#include "arch/win32/ArchMiscWindows.h"
-#include "platform/MSWindowsProcess.h"
-#endif
-
 namespace deskflow {
-
-namespace {
-
-bool runComputerCommand(const QString &commandLine)
-{
-#ifdef Q_OS_WIN
-  using deskflow::platform::MSWindowsProcess;
-  if (ArchMiscWindows::isProcessElevated()) {
-    LOG_DEBUG("current process is elevated, starting detached process as session user");
-    return MSWindowsProcess::startDetachedAsSessionUser(commandLine.toStdWString());
-  }
-#endif
-
-  auto args = QProcess::splitCommand(commandLine);
-  if (args.isEmpty()) {
-    return false;
-  }
-  const auto program = args.takeFirst();
-  return QProcess::startDetached(program, args);
-}
-
-} // namespace
 
 //
 // Computer
@@ -152,7 +124,7 @@ void Computer::enter(KeyModifierMask toggleMask)
   if (Settings::value(Settings::Core::EnableEnterCommand).toBool()) {
     const auto commandLine = Settings::value(Settings::Core::ComputerEnterCommand).toString();
     LOG_DEBUG("running computer enter command: %s", qPrintable(commandLine));
-    if (!runComputerCommand(commandLine))
+    if (!runDetachedCommand(commandLine))
       LOG_ERR("failed to run computer enter command");
   }
 }
@@ -179,7 +151,7 @@ bool Computer::leave()
   if (Settings::value(Settings::Core::EnableExitCommand).toBool()) {
     const auto commandLine = Settings::value(Settings::Core::ComputerExitCommand).toString();
     LOG_DEBUG("running computer exit command: %s", qPrintable(commandLine));
-    if (!runComputerCommand(commandLine))
+    if (!runDetachedCommand(commandLine))
       LOG_ERR("failed to run computer exit command");
   }
 

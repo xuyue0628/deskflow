@@ -157,6 +157,8 @@ enum class EventTypes : uint32_t
   ServerAppReloadConfig,
   ServerAppForceReconnect,
   ServerAppResetServer,
+  ServerAppScreenLocked,
+  ServerAppScreenUnlocked,
 
   /// This event is sent when key is down. Event data is a pointer to KeyInfo (count == 1)
   KeyStateKeyDown,

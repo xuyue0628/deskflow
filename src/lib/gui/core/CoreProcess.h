@@ -47,6 +47,10 @@ public:
   void applyLogLevel();
   void clearSettings();
   void retryDaemon();
+  void setAutoRestartEnabled(bool enabled)
+  {
+    m_autoRestartEnabled = enabled;
+  }
 
   // getters
   Settings::CoreMode mode() const
@@ -134,6 +138,7 @@ private:
   FileTail *m_daemonFileTail = nullptr;
   QProcess *m_process = nullptr;
   QString m_appPath;
+  bool m_autoRestartEnabled = true;
 };
 
 } // namespace deskflow::gui
